@@ -1,7 +1,7 @@
 /*
    
     RedBlueLines - simple stereoscopic editor to be emeded in self-repicable SVG web pages
-    Copyright (C) 2011  Marcin Kik mki1967@gmail.com
+    Copyright (C) 2013  Marcin Kik mki1967@gmail.com
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
