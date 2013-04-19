@@ -1,0 +1,13 @@
+This repository is for some simple programs
+with stereoscopic visualisation, for "red-blue" glasses,
+of 3D models consisting of line segments.
+
+It would be nice to have these programs in the protable
+format.
+Thus, HTML and Javascript are prefered tools for their 
+creatiom.
+
+The first approach is somwhat "experimental" application
+of SVG for this purpose.
+
+

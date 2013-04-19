@@ -1,0 +1,200 @@
+<?xml version="1.0" standalone="no"?> 
+<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd"> 
+<svg  id="rblSvg" width="100%" height="100%" viewBox="-21.0 -21.0 42.0 42.0" preserveAspectRatio="xMidYMid slice" version="1.1" xmlns="http://www.w3.org/2000/svg" 
+xmlns:xlink="http://www.w3.org/1999/xlink" onload="onLoad(evt)"> 
+<title>
+RedBlueLines
+</title>
+<!--
+RedBlueLines
+Copyright (C) 2011  Marcin Kik mki1967@gmail.com 
+    The JavaScript code in this page is free software: you can
+    redistribute it and/or modify it under the terms of the GNU
+    General Public License (GNU GPL) as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option)
+    any later version.  The code is distributed WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+    As additional permission under GNU GPL version 3 section 7, you
+    may distribute non-source (e.g., minimized or compacted) forms of
+    that code without the copy of the GNU GPL normally required by
+    section 4, provided you include this license notice and a URL
+    through which recipients can access the Corresponding Source.
+-->
+<rbl:rbldata xmlns:rbl="RedBlueLines.mki1967">
+ <rbl:cursor>
+  <rbl:cursorposition jsvalue="[0,0,0]" />
+  <rbl:cursorsize jsvalue="0.5" />
+  <rbl:cursorstep jsvalue="1" />
+ </rbl:cursor>
+ <rbl:framesize jsvalue="10" />
+ <rbl:eyes>
+  <rbl:lefteye  jsvalue="[-3.25,0.0,-60.0]"/>
+  <rbl:righteye jsvalue="[3.25,0.0,-60.0]"/>
+  <rbl:monoeye  jsvalue="[0.0,0.0,-60.0]"/>
+  <rbl:eyesmode  jsvalue="'stereo'"/>
+ </rbl:eyes>
+ <rbl:rotation jsvalue="[ [1,0,0], [0,1,0], [0,0,1] ]"/>
+ <rbl:segments id="segmentsData">
+  <rbl:seg jsvalue="[[0, 0, 0], [0, 0, 0]]"/>
+ </rbl:segments>
+</rbl:rbldata>
+
+
+<g id="screenId" transform=" scale(1,-1)" 
+ onmousedown="onMouseDown(evt)"  onmouseup="onMouseUp(evt)" onmousemove="onMouseMove(evt)" >
+
+<g style="stroke:rgb(170,0,0)" opacity="1" id="rgId" > 
+<rect  x="-21.0" y="-21.0" width="42.0" height="42.0" style="fill:rgb(0,0,0)" stroke="none" />
+<g id="redCursor" style="stroke-width:0.1">
+<line />
+<line />
+</g>
+<g id="redLinkMarker" style="stroke-width:0.1">
+<line />
+</g>
+<g id="redFrame" style="stroke-width:0.05">
+<line />
+<line />
+<line />
+<line />
+</g>
+
+<g id="redSegments"  style="stroke-width:0.08">
+<line />
+</g>
+<g id="redSelected"  style="stroke-width:0.15">
+<line />
+</g>
+</g>
+
+<g style="stroke:rgb(0,0,255)" opacity="0.5" id="bgId" >
+<rect  x="-21.0" y="-21.0" width="42.0" height="42.0" style="fill:rgb(0,0,0)" stroke="none" />
+<g id="blueCursor" style="stroke-width:0.1">
+<line />
+<line />
+</g>
+<g id="blueLinkMarker" style="stroke-width:0.1">
+<line />
+</g>
+<g id="blueFrame" style="stroke-width:0.05">
+<line />
+<line />
+<line />
+<line />
+</g>
+<g id="blueSegments"  style="stroke-width:0.08">
+<line />
+</g>
+<g id="blueSelected"  style="stroke-width:0.15">
+<line />
+</g>
+</g>
+
+</g>
+
+
+
+
+<g id="leftMenuId" font-size="1" transform="translate(-21,0)">
+
+<text id="cursorTxt" y="-10" fill="white" font-family="Verdana">
+[0,0,0]
+</text>
+
+<svg y="-8" width="1" height="1.3" onmousedown="jumpToNearestEndtpoint()">
+<rect width="1" height="1.3" fill="grey" />
+<text y="1" fill="white" >J</text>
+</svg>
+
+<svg y="-6" width="1" height="1" onmousedown="deleteSelected()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >#</text>
+</svg>
+
+<svg y="-4" width="1" height="1" onmousedown="linkSelect()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >S</text>
+</svg>
+
+<svg y="-2" width="1" height="1" onmousedown="selectAll()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >A</text>
+</svg>
+
+<svg y="0" width="1" height="1" onmousedown="starSelect()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >*</text>
+</svg>
+
+
+
+<svg y="2" width="1" height="1" onmousedown="toggleSelections()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >X</text>
+</svg>
+
+<svg y="4" width="1" height="1" onmousedown="forward()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >F</text>
+</svg>
+
+<svg y="6" width="1" height="1" onmousedown="back()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >B</text>
+</svg>
+
+
+</g>
+
+<g id="rightMenuId" font-size="1" transform="translate(20,0)">
+
+<svg y="-6" width="1" height="1" onmousedown="help()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >?<desc> Help </desc></text>
+</svg>
+
+<svg y="-4" width="1" height="1" onmousedown="linkingPlus()" >
+<rect width="1" height="1" fill="grey"/>
+<text y="1" fill="white" >+</text>
+</svg>
+
+<svg y="-2" width="1" height="1" onmousedown="linkingMinus()" >
+<rect width="1" height="1" fill="grey"/>
+<text y="1" fill="white" >-</text>
+</svg>
+
+<svg y="0" width="1" height="1" onmousedown="rotationReset()">
+<rect width="1" height="1" fill="grey" />
+<text y="1" fill="white" >L</text>
+</svg>
+
+<svg y="2" width="1" height="1" onmousedown="toggleMonoStereo()">
+<rect width="1" height="1" fill="grey"/>
+<text y="1" fill="white" >E</text>
+</svg>
+
+<svg y="4" width="1" height="1" onmousedown="switchMode()" >
+<rect width="1" height="1" fill="grey"/>
+<text y="1" fill="white" >M</text>
+</svg>
+
+<svg y="6" width="1" height="1" onmousedown="dump()" >
+<rect width="1" height="1" fill="grey"/>
+<text y="1" fill="white" >D</text>
+</svg>
+
+
+</g>
+
+<script id="rblDataId" type="text/javascript" >
+var rbl="test";
+</script>
+
+<script id="rblProgramId" type="text/javascript" xlink:href="rbl.js" > <![CDATA[
+/*
+*/
+]]> </script>
+
+</svg>

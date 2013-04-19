@@ -1,0 +1,11 @@
+# for editor backups
+*~
+
+# for Java
+
+*.class
+
+# Package Files #
+*.jar
+*.war
+*.ear
