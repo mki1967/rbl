@@ -1,0 +1,36 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="UTF-8" />
+<meta name="keywords" content="SVG, JavaScript" />
+<meta name="description" content="Usage instructions for the RedBlueLines editor" />
+<title>
+get key code
+</title>
+</head>
+<body>
+<h2> Key codes:</h2>
+
+<p> 
+key code:
+<b id="code">
+</b>
+</p>
+
+
+<script type="text/ecmascript"> 
+/*
+Print the code of the key
+*/
+function onKeyDown(e){
+code=e.keyCode? e.keyCode : e.charCode;
+document.getElementById("code").innerHTML=""+code;
+// document.writeln("<p> key code: "+code+"</p>");
+// alert("<p> key code: "+code+"</p>");
+}
+document.onkeydown=onKeyDown;
+</script>
+
+
+</body>
+</html>

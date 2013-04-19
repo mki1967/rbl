@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>
+RedBlueLines Stereoscopic Editor
+</title>
+<!--
+RedBlueLines Stereoscopic Editor
+Copyright (C) 2011  Marcin Kik mki1967@gmail.com 
+    The JavaScript code in this page is free software: you can
+    redistribute it and/or modify it under the terms of the GNU
+    General Public License (GNU GPL) as published by the Free Software
+    Foundation, either version 3 of the License, or (at your option)
+    any later version.  The code is distributed WITHOUT ANY WARRANTY;
+    without even the implied warranty of MERCHANTABILITY or FITNESS
+    FOR A PARTICULAR PURPOSE.  See the GNU GPL for more details.
+
+    As additional permission under GNU GPL version 3 section 7, you
+    may distribute non-source (e.g., minimized or compacted) forms of
+    that code without the copy of the GNU GPL normally required by
+    section 4, provided you include this license notice and a URL
+    through which recipients can access the Corresponding Source.
+-->
+</head>
+<body onload="onLoad()" style="margin: 0px; padding: 0px;" >
+<div id="helpDiv" style="display:none;">
+<h2> Instructions (press 'H' to hide/show): </h2>
+<h3>About RedBlueLines</h3>
+
+<p> 
+RedBlueLines Stereoscopic Editor is a self-replicable html page with a simple stereoscopic editor embedded in it.
+</p>
+<p>
+Copyright © 2011  Marcin Kik mki1967@gmail.com<br />
+<a href="http://www.gnu.org/licenses/"> License: GPL v.3 </a>
+</p>
+
+
+<h3>User interface manual</h3>
+
+<p> 
+RedBlueLines lets you view and design skeletons consisting of the segments with the endpoints on a 3D grid contained in a cube.
+To take full advantage of the RedBlueLines editor you have to enable 'pop-up windows'.
+</p>
+<p> 
+You can switch between stereoscopic and "monoscopic" view mode ('E').
+To work in the stereoscopic mode you need standard red-blue glasses 
+(with the red one on the left eye and the blue one on the right eye).
+</p>
+<p> 
+You can toggle the visibility and mobility of the cursor ('M').
+If the cursor is visible, then you can also see the square  that is the intersection of the cube with
+one of the cursor-containing XY, XZ, or YZ planes (the one which is "most parallel" to the screen).
+In "cursor-moving" (the larger cursor) mode you can move the cursor on the square with arrow keys. 
+You can also move the whole square backward or forward ('B' or 'F').
+In "cursor-visible" (the smaller cursor) mode you can rotate the editing cube 
+and the square is updated automatically.  
+In cursor moving mode: clicking a mouse moves the cursor on the square towards the mouse pointer.
+In the other modes, clicking a mouse on the projection screen switches the 'rotation mode' on/off.
+In the 'rotation mode' the edited object is being rotated as the mouse is being moved.
+</p>
+<p>
+You can switch the "linking mode" on ('+') or off ('-').
+In the linking mode you can see a "linking line" between the current and the previous position
+of the cursor. You can insert a new segment identical to the linking line ('+').
+You can also use the linking line to select existing segment identical to the line ('S').
+</p>
+
+<p>
+The following actions can be performed by mouse-clicking on the icon or pressing a keyboard key
+with the corresponding symbol:
+<ul>
+<dt>'?'</dt>
+<dd> - open the help page (in a separate pop-up window)</dd>
+
+<dt>'L', Space </dt>
+<dd> - adjust the rotation to the right angles </dd>
+
+<dt>'E'</dt>
+<dd> - switch between stereoscopic and 'macroscopic' view </dd>
+
+<dt>'M'</dt>
+<dd> - change the cursor moving and visibility modes</dd>
+
+<dt>'+', Enter, double mouse click in the same place</dt>
+<dd> - switch on the linking mode </dd>
+<dd> - in the linking mode: insert new segment </dd>
+
+<dt>'-', Escape</dt>
+<dd> - switch off the linking mode </dd>
+
+
+<dt>'J'</dt>
+<dd> - let the cursor jump to the nearest endpoint <dd>
+
+<dt>'#', Delete</dt>
+<dd> - remove the selected segments </dd>
+
+<dt>'S'</dt>
+<dd> - in the linking mode: toggle the selection of the segment </dd>
+
+<dt>'*'</dt>
+<dd> - select the segments incident to the cursor</dd>
+
+<dt>'A'</dt>
+<dd> - select all segments </dd>
+
+<dt>'X'</dt>
+<dd> - toggle the selection of each segment </dd>
+
+<dt>'B', 'F', Arrow keys</dt>
+<dd> - either move the cursor or rotate the object, depending on the 'cursor moving mode'</dd>
+
+<dt>'D'</dt>
+<dd> - dump the text of the current state of the editor and data. 
+This text can be copy-pasted to your text editor and saved as
+a SVG document (a text file with a name suffix ".svg"), which can be resumed later in the web browser
+for viewing or editing.
+This is the way of saving your work, since JavaScript does not have direct access to your file system.
+</dd>
+</ul>
+</p>
+
+<h3> Warnings </h3>
+<p>
+Be aware that in the current version of RedBlueLines:
+<ul>
+<li> There is no "undo" operation.</li>
+<li> You can loose your changes without warning (e.g. by going out of the page, closing the window, closing the browser, and so on ...).
+Use the dump operation ('D') liberally to store current states of the data. 
+The dumped data is stamped with the exact date and time of its creation. 
+</li> 
+<li> Two or more collinear intersecting segments are visible as a single segment. (You may try to use 'J', to detect their endpoints.)  </li>
+</ul>
+</p>
+<type="text/javascript"p><strong>(Press 'H' to hide instructions and continue editing.)</strong></p>
+</div>
+<canvas id="myCanvas" width="100" height="100"  style="border:0px; margin: 0px; padding: 0px;" >
+Your browser does not support the canvas element.
+</canvas>
+
+<script type="text/javascript">
+/* GLOBAL VARIABLES */
+
+var canvas=document.getElementById("myCanvas");
+var ctx=canvas.getContext("2d");
+
+var helpDiv=document.getElementById("helpDiv");
+var helpDivDisplayNoneStyle=helpDiv.getAttribute("style"); // initially not displayed
+
+var color= ["#000000", "#FF0000", "#0000FF", "#FFFFFF" ];
+
+/* CALLBACKS */
+
+function onLoad()
+{
+
+// set remaining callbacks
+window.onresize=onResize;
+// window.addEventListener ("keydown", onKeyDown, true);
+window.onkeydown=onKeyDown;
+// set canvas size and redraw
+onResize();
+
+// welcome message
+ctx.fillStyle=color[3];
+// ctx.font = "40pt Calibri";
+ctx.font = "15pt Verdana";
+ctx.fillText(JSON.stringify(ed,true," ")+" (press key 'H' to open/close instructions)" , 40,40);
+}
+
+function onResize() {
+var wth = parseInt(window.innerWidth);
+var hth = parseInt(window.innerHeight);
+canvas.setAttribute("width", ''+wth);
+canvas.setAttribute("height", ''+hth-5);
+
+redraw();
+}
+
+
+function onKeyDown(e){
+code=e.keyCode? e.keyCode : e.charCode;
+e.stopPropagation();
+//  alert(code); // test
+switch(code)
+  {
+  case 72: // up
+    if (helpDiv.getAttribute("style")==helpDivDisplayNoneStyle)
+      {
+      window.onkeydown=onKeyDownInHelp;
+      helpDiv.setAttribute("style", "display:block");
+      }
+    else	
+      helpDiv.setAttribute("style", helpDivDisplayNoneStyle);
+    break;
+  };
+}
+
+function onKeyDownInHelp(e){
+code=e.keyCode? e.keyCode : e.charCode;
+switch(code)
+  {
+  case 72: // up
+      helpDiv.setAttribute("style", helpDivDisplayNoneStyle);
+      window.onkeydown=onKeyDown;
+    break;
+  };
+}
+
+
+
+
+/* REDRAWING FUNCTIONS */
+
+function redraw(){
+var wth = parseInt(canvas.getAttribute("width"));
+var hth = parseInt(canvas.getAttribute("height"));
+
+ctx.globalCompositeOperation='source-over';
+ctx.fillStyle=color[0];
+ctx.fillRect(0,0,wth,hth);
+
+ctx.globalCompositeOperation='lighter';
+
+// placeholder ...
+/*
+ctx.fillStyle=color[1];
+
+ctx.fillRect(0,0,wth/2,hth/2);
+ctx.fillStyle=color[2];
+ctx.fillRect(wth/4,hth/4, wth/2,hth/2);
+*/
+
+ctx.strokeStyle="#FF0000";
+ctx.fillStyle="#FFFFFF";
+
+ctx.moveTo(0,0);
+ctx.lineTo(200,100);
+ctx.stroke();
+
+}
+
+</script>
+
+<script id="data" type="text/javascript">
+var data="ala ma kota";
+var ed={
+ "programName": "RBL editor",
+ "author": "kik"
+};
+</script>
+
+</body>
+</html>
+
