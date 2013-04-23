@@ -29,13 +29,14 @@ Your browser does not support the canvas element.
 </canvas>
 
 <script src="rbl-canvas.js"> </script>
-<script src="rbl-canvas-tester.js"> </script>
+<script src="rbl-segments.js"> </script>
+<script src="rbl-editor.js"> </script>
 
 <script>
 
 
 rblCanvas=new RblCanvas("rblCanvasId");
-rblTester=new RblCanvasTester( rblCanvas ); // example canvas user
+rblEditor=new RblEditor( rblCanvas ); // example canvas user
 
 window.onresize= function () 
 {
