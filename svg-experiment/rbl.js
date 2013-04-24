@@ -708,7 +708,7 @@ doc.writeln('<head><title>Dumped RBL</title></head>');
 doc.writeln('<body>');
 doc.writeln('<h3> RedBlueLines dumped at: '+(new Date())+'</h3>');
 doc.writeln('<p> Copy-paste the selected text from the textarea below to any text editor and save as a file with ".svg" extension. </p>');
-doc.writeln('<p> Also download the script "rbl.js" to the same directory. </p>');
+doc.writeln('<p> Also download the script <a href="rbl.js" target="_blank">rbl.js</a> to the same directory. </p>');
 doc.writeln(lt+'textarea id="dumped" rows="40" cols="150">');
 doc.writeln('<?xml version="1.0" standalone="no"?>');
 doc.writeln('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">');
