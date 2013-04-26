@@ -1,3 +1,9 @@
+# local conventions:
+# temporary files
+*.tmp
+# automaticaly created java scripts
+*\_exe.js
+
 # for editor backups
 *~
 
