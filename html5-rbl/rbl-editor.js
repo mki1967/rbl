@@ -36,6 +36,21 @@ MONO_EYE=[0.0,0.0,-60.0];
 
 leftEye=MONO_EYE; ////
 rightEye=MONO_EYE; ////
+
+var eyesMode='mono'
+
+function setEyesMode(mode)
+{
+eyesMode=mode;
+if(mode=='mono') leftEye=rightEye=MONO_EYE;
+else // stereo 
+  {
+  leftEye=LEFT_EYE;
+  rightEye=RIGHT_EYE;
+  }
+}
+
+
 screenZ=0.0;
 
 cursorPosition=[0,0,0];
@@ -46,7 +61,7 @@ frameSize=10;
 
 /* Color names */
 BLACK = "#000000";
-RED   = "#FF0000";
+RED   = "#A00000";
 BLUE  = "#0000FF";
 WHITE = "#FFFFFF";
 
@@ -66,16 +81,31 @@ canvas.setColorAndMode(this.color, 'lighter');
 LEFT_SEGMENT_LINE= new LineStyle(RED, 2);
 RIGHT_SEGMENT_LINE= new LineStyle(BLUE, 2);
 
+LEFT_SELECTED_LINE= new LineStyle(RED, 3);
+RIGHT_SELECTED_LINE= new LineStyle(BLUE, 3);
+
 LEFT_CURSOR_LINE= new LineStyle(RED, 4);
 RIGHT_CURSOR_LINE= new LineStyle(BLUE, 4);
 
 LEFT_FRAME_LINE= new LineStyle(RED, 1);
 RIGHT_FRAME_LINE= new LineStyle(BLUE, 1);
 
+LEFT_MARKER_LINE= new LineStyle(RED, 1);
+RIGHT_MARKER_LINE= new LineStyle(BLUE, 1);
+
+
+var editor // global variable for the rblEditor in this file
+function redraw() // global redraw in this file
+{
+editor.redraw();
+}
+
 function RblEditor( rblCanvasArg ) // constructor of the canvas user
 {
 this.canvas= rblCanvasArg;
 rblCanvasArg.setUser(this);
+this.canvas.setMinSize(30);
+editor=this;  // set the global variable for editor
 }
 
 edPrototype=RblEditor.prototype;
@@ -84,14 +114,19 @@ edPrototype.redraw= function ()
 {
 var canvas= this.canvas;
 canvas.clearScreen();
-canvas.context.lineWidth=2;
-canvas.setColorAndMode(canvas.RED, 'lighter');
-canvas.drawSegment( -10, -10, 0.5, 0.5);
-canvas.drawSegment( -10, 0, 1000, 5);
-canvas.setColorAndMode(canvas.BLUE, 'lighter');
-canvas.drawSegment( 0, 0, 0.5, 0.5);
-canvas.setColorAndMode(canvas.BLUE, 'lighter');
-canvas.drawSegment( 0.5, 0.5, 1, 1);
+
+redrawCursorAndFrame(canvas);
+
+project(canvas, LEFT_SEGMENT_LINE, leftEye, screenZ, rotation, segments);
+project(canvas, RIGHT_SEGMENT_LINE, rightEye, screenZ, rotation, segments);
+
+var selected=new Array();
+var i;
+for(i=0; i<segments.length; i++) 
+  if(segments[i].selected) selected.push(segments[i]);
+
+project(canvas, LEFT_SELECTED_LINE, leftEye, screenZ, rotation, selected);
+project(canvas, RIGHT_SELECTED_LINE, rightEye, screenZ, rotation, selected);
 }
 
 
@@ -162,141 +197,37 @@ s=s+"]";
 return s;
 }
 
-
-function cleanLineAttributes(lines)
-{
-var i=0;
-for(i=0; i<lines.length; i++) 
-  {
-    lines[i].removeAttribute("x1");
-    lines[i].removeAttribute("y1");
-    lines[i].removeAttribute("x2");
-    lines[i].removeAttribute("y2");
-  }
-}
-
 */
 
-function redrawCursorAndFrame(){
+
+function redrawCursorAndFrame(canvas){
 var i=0;
 if(isCursorVisible){
   makeCursorAndFrameSegments();
-  project(redCursorLines, leftEye, screenZ, rotation, cursorSegments);
-  project(blueCursorLines, rightEye, screenZ, rotation, cursorSegments);
-  project(redFrameLines, leftEye, screenZ, rotation, frameSegments);
-  project(blueFrameLines, rightEye, screenZ, rotation, frameSegments);
+  project(canvas, LEFT_CURSOR_LINE, leftEye, screenZ, rotation, cursorSegments);
+  project(canvas, RIGHT_CURSOR_LINE, rightEye, screenZ, rotation, cursorSegments);
+  project(canvas, LEFT_FRAME_LINE, leftEye, screenZ, rotation, frameSegments);
+  project(canvas, RIGHT_FRAME_LINE, rightEye, screenZ, rotation, frameSegments);
   if(linkMarker!=null) {
-     project(redLinkMarkerLines, leftEye, screenZ, rotation, linkMarkerSegments);
-     project(blueLinkMarkerLines, rightEye, screenZ, rotation, linkMarkerSegments);     
+     project(canvas, LEFT_MARKER_LINE, leftEye, screenZ, rotation, linkMarkerSegments);
+     project(canvas, RIGHT_MARKER_LINE, rightEye, screenZ, rotation, linkMarkerSegments);     
      }
-  /*
-  else{
-     cleanLineAttributes(redLinkMarkerLines);
-     cleanLineAttributes(blueLinkMarkerLines);
-     }
-   */
   }
-/*
-else{
-    cleanLineAttributes(redFrameLines);
-    cleanLineAttributes(redCursorLines);
-    cleanLineAttributes(blueFrameLines);
-    cleanLineAttributes(blueCursorLines);
-    cleanLineAttributes(redLinkMarkerLines);
-    cleanLineAttributes(blueLinkMarkerLines);
-  }
-if(isCursorVisible)
-  cursorTxt.textContent=vToSource(cursorPosition);
-else
- cursorTxt.textContent=""
-*/
 }
 
 
-function redraw(){
-redrawCursorAndFrame();
-
-project(redSegmentsGroup.getElementsByTagName("line"), leftEye, screenZ, rotation, segments);
-project(blueSegmentsGroup.getElementsByTagName("line"), rightEye, screenZ, rotation, segments);
-
-var selected=new Array();
-var i;
-for(i=0; i<segments.length; i++) 
-  if(segments[i].selected) selected.push(segments[i]);
-
-project(redSelectedGroup.getElementsByTagName("line"), leftEye, screenZ, rotation, selected);
-project(blueSelectedGroup.getElementsByTagName("line"), rightEye, screenZ, rotation, selected);
-
-
-}
-
-function project(lines, eye, screenZ, rotation, segments){
-if(segments.length>lines.length)
-  {
-   addClonesToGroup(lines[0].parentNode, segments.length+10-lines.length);
-   lines=lines[0].parentNode.getElementsByTagName("line");
-  }
+function project(canvas, lineStyle, eye, screenZ, rotation, segments){
+lineStyle.setOnCanvas(canvas);
 var i=0;
 for(i=0; i<segments.length; i++){
    v1= zPerspective(eye, screenZ, mvMul(rotation, segments[i][0]));
    v2= zPerspective(eye, screenZ, mvMul(rotation, segments[i][1]));
-   lines[i].setAttribute("x1", v1[0]);
-   lines[i].setAttribute("y1", v1[1]);
-   lines[i].setAttribute("x2", v2[0]);
-   lines[i].setAttribute("y2", v2[1]);
+   canvas.drawSegment(v1[0],v1[1], v2[0], v2[1]);
    }
-
-for(i=segments.length; i<lines.length; i++)
-    cleanElementAttributes(lines[i]);
-
-if(lines.length>segments.length+20)
-  {
-  var x1=lines[segments.length+10];
-  var x2=lines[lines.length-1];
-  while(x1!=x2){
-    var s=x1.nextSibling;
-    x1.parentNode.removeChild(x1);
-    x1=s;
-    }   
-  }
-
 }
 
 
 
-
-
-function cleanElementAttributes(element){
-while(element.hasAttributes())
-  element.removeAttribute(element.attributes[0].name);
-}
-
-function addClonesToGroup(group, n) 
-/* the group must be non-empty */
-{
-var revSeparators=new Array();
-var  x=group.lastChild;
-var y;
-while(x.nodeType != document.ELEMENT_NODE)
-  {
-    y=x.previousSibling;
-    revSeparators.push(x);
-    x=y;
-  } 
-x=x.cloneNode(true);
-cleanElementAttributes(x);
-
-var i;
-for(i=0; i<n; i++)
-  {
-   group.appendChild(x.cloneNode(true));
-  var j;
-  for(j=revSeparators.length-1; j>=0; j--)
-      {
-       group.appendChild(revSeparators[j].cloneNode(true));      
-      }
-  }
-}
 
 
 function dumpData(){
@@ -567,16 +498,57 @@ if(isCursorVisible){
 function back()
 {
     if(isCursorMoving) cursorMove(0,0,-1);
-    else rotation=mmMul(rotationXY(-Math.PI/24), rotation);
-    redraw();
+    else { 
+      rotation=mmMul(rotationXY(-Math.PI/24), rotation);
+      redraw(); 
+    }
 }
 
 
 function forward()
 { 
     if(isCursorMoving) cursorMove(0,0,1);
-    else rotation=mmMul(rotationXY(Math.PI/24), rotation);
-    redraw();
+    else {
+       rotation=mmMul(rotationXY(Math.PI/24), rotation);
+       redraw();
+    }
+}
+
+function up()
+{
+    if(isCursorMoving) cursorMove(0,1,0);
+    else {
+      rotation=mmMul(rotationYZ(Math.PI/24), rotation);
+      redraw();
+    }
+}
+
+function down()
+{
+    if(isCursorMoving) cursorMove(0,-1,0);
+    else {
+      rotation=mmMul(rotationYZ(-Math.PI/24), rotation);
+      redraw();
+    }
+}
+
+
+function left()
+{
+    if(isCursorMoving) cursorMove(-1,0,0);
+    else { 
+      rotation=mmMul(rotationXZ(-Math.PI/24), rotation);
+      redraw();
+    }
+}
+
+function right()
+{
+    if(isCursorMoving) cursorMove(1,0,0);
+    else {
+      rotation=mmMul(rotationXZ(Math.PI/24), rotation);
+      redraw();
+    }
 }
 
 function onKeyDown(e){
@@ -587,33 +559,21 @@ code=e.keyCode? e.keyCode : e.charCode;
 switch(code)
 {
 case 38: // up
-    if(isCursorMoving) cursorMove(0,1,0);
-    else rotation=mmMul(rotationYZ(Math.PI/24), rotation);
+    up();
     break;
 case 40:
-    if(isCursorMoving) cursorMove(0,-1,0);
-    else rotation=mmMul(rotationYZ(-Math.PI/24), rotation);
+    down();
     break;
 case 37:
-    if(isCursorMoving) cursorMove(-1,0,0);
-    else rotation=mmMul(rotationXZ(-Math.PI/24), rotation);
+    left();
     break;
 case 39:
-    if(isCursorMoving) cursorMove(1,0,0);
-    else rotation=mmMul(rotationXZ(Math.PI/24), rotation);
+    right();
     break;
 case 70: // F
-/*
-    if(isCursorMoving) cursorMove(0,0,1);
-    else rotation=mmMul(rotationXY(Math.PI/24), rotation);
-*/
     forward();
     break;
 case 66: // B
-/*
-    if(isCursorMoving) cursorMove(0,0,-1);
-    else rotation=mmMul(rotationXY(-Math.PI/24), rotation);
-*/
     back();
     break;
 case 32: // space
@@ -659,7 +619,7 @@ case 74: // J
   break;
 
 };
-redraw();
+// editor.redraw();
 // alert(code); // for tests
 }
 document.onkeydown=onKeyDown;
