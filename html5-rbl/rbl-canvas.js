@@ -17,7 +17,7 @@ this.RED   = "#FF0000";
 this.BLUE  = "#0000FF";
 this.WHITE = "#FFFFFF";
 
-
+this.context.fillStyle = this.BLACK;
 this.center=[0,0]; 
 this.minSize=2;
 
@@ -134,9 +134,13 @@ this.updateRealScreen();
 
 RblCanvas.prototype.clearScreen = function()
 {
+/*
 this.context.globalCompositeOperation= 'source-over';
 this.context.fillStyle= this.BLACK;
+
 this.context.fillRect(0,0,this.width,this.height);
+*/
+this.context.clearRect(0,0,this.width,this.height);
 }
 
 RblCanvas.prototype.setColorAndMode = function( colorArg, modeArg )
