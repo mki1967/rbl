@@ -218,12 +218,14 @@ if(isCursorVisible){
 
 function project(canvas, lineStyle, eye, screenZ, rotation, segments){
 lineStyle.setOnCanvas(canvas);
+canvas.beginPath();
 var i=0;
 for(i=0; i<segments.length; i++){
    v1= zPerspective(eye, screenZ, mvMul(rotation, segments[i][0]));
    v2= zPerspective(eye, screenZ, mvMul(rotation, segments[i][1]));
    canvas.drawSegment(v1[0],v1[1], v2[0], v2[1]);
    }
+canvas.stroke();
 }
 
 

@@ -146,13 +146,22 @@ this.context.strokeStyle = colorArg;
 this.context.globalCompositeOperation = modeArg;
 }
 
-RblCanvas.prototype.drawSegment = function( x1, y1, x2, y2 )
+RblCanvas.prototype.beginPath = function()
 {
 this.context.beginPath();
+}
+
+RblCanvas.prototype.stroke = function()
+{
+this.context.stroke();
+} 
+
+RblCanvas.prototype.drawSegment = function( x1, y1, x2, y2 )
+{
+// this.context.beginPath();
 this.context.moveTo(this.rx(x1), this.ry(y1));
 this.context.lineTo(this.rx(x2), this.ry(y2));
-this.context.stroke();
-
+// this.context.stroke();
 // alert([this.rx(x1), this.ry(y1) , this.rx(x2), this.ry(y2)]);
 }
 
