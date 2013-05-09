@@ -22,9 +22,6 @@ Arrow keys, 'B', 'F' \t- move the cursor / rotate the object\n \
 "
 
 
-
-alert(HELP_STRING); // test
-
 rotation= [
           [1,0,0],
           [0,1,0],
@@ -95,10 +92,6 @@ RIGHT_MARKER_LINE= new LineStyle(BLUE, 1);
 
 
 var editor // global variable for the rblEditor in this file
-function redraw() // global redraw in this file
-{
-editor.redraw();
-}
 
 function RblEditor( rblCanvasArg ) // constructor of the canvas user
 {
@@ -129,6 +122,10 @@ project(canvas, LEFT_SELECTED_LINE, leftEye, screenZ, rotation, selected);
 project(canvas, RIGHT_SELECTED_LINE, rightEye, screenZ, rotation, selected);
 }
 
+function redraw() // global redraw in this file
+{
+editor.redraw();
+}
 
 isCursorVisible=true;
 isCursorMoving=true;
@@ -229,33 +226,42 @@ canvas.stroke();
 }
 
 
-
-
-
-function dumpData(){
-if(segments.length==0) segInsert(segments, newSeg([0,0,0],[0,0,0]) ); // have at least one dummy segment in XML data
-if(segments.length>rblSegments.length)
-  {
-  addClonesToGroup(rblSegmentsData, segments.length+10-rblSegments.length);
-  rblSegments=rblSegmentsData.getElementsByTagNameNS(rblNS, "seg");
-  }
-var i;
-for(i=0; i<segments.length; i++) rblSegments[i].setAttribute("jsvalue", vArrayToSource(segments[i]) );
-for(i=segments.length; i<rblSegments.length; i++) rblSegments[i].removeAttribute("jsvalue");
-for(i=1; i<rblSegments.length;) 
-  if( !rblSegments[i].hasAttribute("jsvalue") )
-    {
-     while(rblSegments[i].previousSibling.nodeType!=document.ELEMENT_NODE)
-          rblSegmentsData.removeChild(rblSegments[i].previousSibling);
-     rblSegmentsData.removeChild(rblSegments[i]); 
-    }
-    else i++;
-
-rblSegments=rblSegmentsData.getElementsByTagNameNS(rblNS, "seg");
-
-rblRoot.getElementsByTagNameNS(rblNS, "rotation")[0].setAttribute("jsvalue", vArrayToSource(rotation) );
-segDelete(segments, newSeg([0,0,0],[0,0,0]) ); // remove dummy segment if exists
+function getData()
+{
+if(DATA.segments) segments=DATA.segments;
+// ...
 }
+
+function dump()
+{
+var x;
+x=document.getElementById("DataId");
+var data={};
+data.segments=segments;
+x.innerHTML="DATA = "+JSON.stringify(data, null, " ");
+var serializer= new XMLSerializer();
+var string=serializer.serializeToString(document);
+var w=window.open('','_blank');
+var doc=w.document;
+var lt='<';
+doc.writeln('<html>');
+doc.writeln('<head><title>Dumped RBL</title></head>');
+doc.writeln('<body>');
+doc.writeln('<h3> RedBlueLines dumped at: '+(new Date())+'</h3>');
+doc.writeln('<p> Copy-paste the selected text from the textarea below to any text editor and save as a file with ".html" extension. </p>');
+doc.writeln('<p> Also download the script <a href="rbl-edit_exe.js" target="_blank">rbl-edit_exe.js</a> to the same directory. </p>');
+doc.writeln(lt+'textarea id="dumped" rows="40" cols="150">');
+doc.writeln(string);
+doc.writeln(lt+'/textarea>');
+doc.writeln('<body>');
+doc.writeln('</html>');
+doc.close();
+var dumped=doc.getElementById("dumped");
+dumped.select();
+}
+
+
+
 
 /* event handlers */
 
@@ -354,40 +360,6 @@ function help()
 {
 // window.open('http://sites.google.com/site/redbluelines/','_blank');
 alert(HELP_STRING);
-}
-
-function dump()
-{
-/*
-dumpData();
-rblSvg=document.getElementById("rblSvg");
-var serializer= new XMLSerializer();
-var string=serializer.serializeToString(rblSvg);
-
-var w=window.open('','_blank');
-// var w=window.open('','Dumped', 'width=400,height=400');
-
-// var w=window.open('dumped RedBlueLines','');
-
-var doc=w.document;
-// var doc=document;  /// test only !!!!!!!!!
-var lt='<';
-doc.writeln('<html>');
-doc.writeln('<head><title>Dumped RBL</title></head>');
-doc.writeln('<body>');
-doc.writeln('<h3> RedBlueLines dumped at: '+(new Date())+'</h3>');
-doc.writeln('<p> Copy-paste the selected text from the textarea below to any text editor and save as a file with ".svg" extension </p>');
-doc.writeln(lt+'textarea id="dumped" rows="40" cols="150">');
-doc.writeln('<?xml version="1.0" standalone="no"?>');
-doc.writeln('<!DOCTYPE svg PUBLIC "-//W3C//DTD SVG 1.1//EN" "http://www.w3.org/Graphics/SVG/1.1/DTD/svg11.dtd">');
-doc.writeln(string);
-doc.writeln(lt+'/textarea>');
-doc.writeln('<body>');
-doc.writeln('</html>');
-doc.close();
-var dumped=doc.getElementById("dumped");
-dumped.select();
-*/
 }
 
 
@@ -635,6 +607,13 @@ invCTM=scr.getCTM().inverse();
 
 window.onresize=onResize;
 
+
+// initializing actions
+getData();
+
+alert(HELP_STRING); // test
+
+ 
 
 
 
