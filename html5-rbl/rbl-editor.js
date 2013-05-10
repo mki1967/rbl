@@ -125,6 +125,10 @@ for(i=0; i<segments.length; i++)
 
 project(canvas, LEFT_SELECTED_LINE, leftEye, screenZ, rotation, selected);
 project(canvas, RIGHT_SELECTED_LINE, rightEye, screenZ, rotation, selected);
+
+if(isCursorVisible) {
+  canvas.printAt(3,3, WHITE, "cursor = "+JSON.stringify(cursorPosition));
+  }
 }
 
 function redraw() // global redraw in this file

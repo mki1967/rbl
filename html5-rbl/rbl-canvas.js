@@ -142,6 +142,13 @@ this.minSize=minSizeArg;
 this.updateRealScreen();
 }
 
+// printing
+RblCanvas.prototype.printAt = function(x,y, color, text)
+{
+this.context.fillStyle = color;
+this.context.textBaseline = "top";
+this.context.fillText(text, x, y);
+}
 
 // drawing operations
 
