@@ -76,6 +76,19 @@ RblCanvas.prototype.ry = function (y)
 return (this.maxY - y) * this.cy;
 }
 
+// translate pixel coordinates to real coordinates
+
+RblCanvas.prototype.xr = function (x)
+{
+return x/this.cx + this.minX;
+}
+
+
+RblCanvas.prototype.yr = function (y)
+{
+return this.maxY - y/this.cy;
+}
+
 
 // setting  callbacks on HTML includer
 

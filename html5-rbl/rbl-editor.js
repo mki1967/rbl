@@ -91,7 +91,8 @@ LEFT_MARKER_LINE= new LineStyle(RED, 1);
 RIGHT_MARKER_LINE= new LineStyle(BLUE, 1);
 
 
-var editor // global variable for the rblEditor in this file
+var editor; // global variable for the rblEditor in this file
+var canvas; // global variable for the editor.canvas in this file
 
 function RblEditor( rblCanvasArg ) // constructor of the canvas user
 {
@@ -99,6 +100,10 @@ this.canvas= rblCanvasArg;
 rblCanvasArg.setUser(this);
 this.canvas.setMinSize(30);
 editor=this;  // set the global variable for editor
+canvas=this.canvas; // set the global variable for the canvas
+// set event handlers
+canvas.onmousedown=onMouseDown;
+canvas.onmousemove=onMouseMove;
 }
 
 edPrototype=RblEditor.prototype;
@@ -281,24 +286,34 @@ redraw();
 
 function onMouseMove(evt){
 if(mouseAction!=null){
-  x=invCTM.a*evt.clientX+invCTM.e;
-  y=invCTM.d*evt.clientY+invCTM.f;
+  // x=invCTM.a*evt.clientX+invCTM.e;
+  // y=invCTM.d*evt.clientY+invCTM.f;
+  x=canvas.xr(evt.clientX);
+  y=canvas.yr(evt.clientY);
+
   mouseAction(x-lastX, y-lastY);
   lastX=x; lastY=y;
   }
 }
 
+document.onmousemove=onMouseMove;
+
+wasFirstClick=false;
 
 function onMouseDown(evt){
-  invCTM=scr.getCTM().inverse();
-  x=invCTM.a*evt.clientX+invCTM.e;
-  y=invCTM.d*evt.clientY+invCTM.f;
-  var doubleClick= (lastX==x && lastY==y);
-  lastX=x; lastY=y;
+  // invCTM=scr.getCTM().inverse();
+  // x=invCTM.a*evt.clientX+invCTM.e;
+  // y=invCTM.d*evt.clientY+invCTM.f;
+  x=canvas.xr(evt.clientX);
+  y=canvas.yr(evt.clientY);
+
+  var doubleClick= (lastX==x && lastY==y && wasFirstClick);
+  lastX=x; lastY=y; wasFirstClick=!(doubleClick);
 
 if(isCursorMoving){
   mouseAction=null;
   moveToMouse();
+  moveToMouse(); // check it in the future
   if(doubleClick) linkingPlus();
   }
 else if(mouseAction==null){
@@ -309,6 +324,7 @@ else {
   }
 }
 
+document.onmousedown=onMouseDown;
 
 
 function onMouseUp(evt){
@@ -366,6 +382,7 @@ alert(HELP_STRING);
 function switchMode()
 {
 mouseAction=null;
+wasFirstClick=false;
 if(isCursorVisible && isCursorMoving)  isCursorMoving=false;
 else if(isCursorVisible) isCursorVisible=false;
 else isCursorVisible=isCursorMoving=true;
@@ -599,13 +616,16 @@ case 74: // J
 document.onkeydown=onKeyDown;
 
 
+
+
+/*
 function onResize()
 {
-invCTM=scr.getCTM().inverse();
+// invCTM=scr.getCTM().inverse();
 // alert('onResize  '+invCTM.toString()); //for tests
 }
-
-window.onresize=onResize;
+*/
+// window.onresize=onResize;
 
 
 // initializing actions
