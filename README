@@ -7,8 +7,7 @@ format.
 Thus, HTML and JavaScript are preferred tools for their 
 creation.
 
-The first approach is somewhat "experimental" application
-of SVG for this purpose.
-Working example has been placed on:
-     https://dl.dropboxusercontent.com/u/22924817/svg-experiment/rbl-svg.html
+Working version is placed on:
+https://dl.dropboxusercontent.com/u/22924817/rbl/index.html
+
 
