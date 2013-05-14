@@ -21,34 +21,19 @@ Arrow keys, 'B', 'F' \t- move the cursor / rotate the object\n \
 \nMore info on:\t https://github.com/mki1967/rbl.git\n \
 "
 
+/// DATA
 
 rotation= [
           [1,0,0],
           [0,1,0],
           [0,0,1]
           ];
-LEFT_EYE=[-3.25,0.0,-60.0];
-RIGHT_EYE=[3.25,0.0,-60.0];
-MONO_EYE=[0.0,0.0,-60.0];
-
-leftEye=MONO_EYE; ////
-rightEye=MONO_EYE; ////
-
-var eyesMode='mono'
-
-function setEyesMode(mode)
-{
-eyesMode=mode;
-if(mode=='mono') leftEye=rightEye=MONO_EYE;
-else // stereo 
-  {
-  leftEye=LEFT_EYE;
-  rightEye=RIGHT_EYE;
-  }
-}
-
 
 screenZ=0.0;
+
+// eyes
+
+var eyes=new RblEyes();
 
 cursorPosition=[0,0,0];
 cursorSize=0.5;
@@ -62,33 +47,23 @@ RED   = "#A00000";
 BLUE  = "#0000FF";
 WHITE = "#FFFFFF";
 
-/* Line style object */
-function LineStyle( color1, width1 )
-{
-this.color=color1;
-this.width=width1;
-}
 
-LineStyle.prototype.setOnCanvas= function( canvas )
-{
-canvas.context.lineWidth=this.width;
-canvas.setColorAndMode(this.color, 'lighter');
-}
 
-LEFT_SEGMENT_LINE= new LineStyle(RED, 2);
-RIGHT_SEGMENT_LINE= new LineStyle(BLUE, 2);
+// line styles
+LEFT_SEGMENT_LINE= new RblLineStyle(RED, 2);
+RIGHT_SEGMENT_LINE= new RblLineStyle(BLUE, 2);
 
-LEFT_SELECTED_LINE= new LineStyle(RED, 3);
-RIGHT_SELECTED_LINE= new LineStyle(BLUE, 3);
+LEFT_SELECTED_LINE= new RblLineStyle(RED, 3);
+RIGHT_SELECTED_LINE= new RblLineStyle(BLUE, 3);
 
-LEFT_CURSOR_LINE= new LineStyle(RED, 4);
-RIGHT_CURSOR_LINE= new LineStyle(BLUE, 4);
+LEFT_CURSOR_LINE= new RblLineStyle(RED, 4);
+RIGHT_CURSOR_LINE= new RblLineStyle(BLUE, 4);
 
-LEFT_FRAME_LINE= new LineStyle(RED, 1);
-RIGHT_FRAME_LINE= new LineStyle(BLUE, 1);
+LEFT_FRAME_LINE= new RblLineStyle(RED, 1);
+RIGHT_FRAME_LINE= new RblLineStyle(BLUE, 1);
 
-LEFT_MARKER_LINE= new LineStyle(RED, 1);
-RIGHT_MARKER_LINE= new LineStyle(BLUE, 1);
+LEFT_MARKER_LINE= new RblLineStyle(RED, 1);
+RIGHT_MARKER_LINE= new RblLineStyle(BLUE, 1);
 
 
 var editor; // global variable for the rblEditor in this file
@@ -115,16 +90,16 @@ canvas.clearScreen();
 
 redrawCursorAndFrame(canvas);
 
-project(canvas, LEFT_SEGMENT_LINE, leftEye, screenZ, rotation, segments);
-project(canvas, RIGHT_SEGMENT_LINE, rightEye, screenZ, rotation, segments);
+project(canvas, LEFT_SEGMENT_LINE, eyes.leftEye, screenZ, rotation, segments);
+project(canvas, RIGHT_SEGMENT_LINE, eyes.rightEye, screenZ, rotation, segments);
 
 var selected=new Array();
 var i;
 for(i=0; i<segments.length; i++) 
   if(segments[i].selected) selected.push(segments[i]);
 
-project(canvas, LEFT_SELECTED_LINE, leftEye, screenZ, rotation, selected);
-project(canvas, RIGHT_SELECTED_LINE, rightEye, screenZ, rotation, selected);
+project(canvas, LEFT_SELECTED_LINE, eyes.leftEye, screenZ, rotation, selected);
+project(canvas, RIGHT_SELECTED_LINE, eyes.rightEye, screenZ, rotation, selected);
 
 if(isCursorVisible) {
   canvas.printAt(3,3, WHITE, "cursor = "+JSON.stringify(cursorPosition));
@@ -186,37 +161,16 @@ if(linkMarker!=null) linkMarkerSegments[0]=[linkMarker, cursorPosition];
 
 
 
-/************************ UPDATE BELOW **********************************/
-/* updating XML and SVG document */
-
-/* NOT NEEDED
-function vToSource(v){
-return ("["+v[0]+","+v[1]+","+v[2]+"]");
-}
-
-function vArrayToSource(va){
-var s="[";
-var i;
-for( i=0; i<va.length-1; i++) s=s+vToSource(va[i])+",";
-if(va.length>0) s=s+vToSource(va[va.length-1]);
-s=s+"]";
-return s;
-}
-
-*/
-
-
 function redrawCursorAndFrame(canvas){
-var i=0;
 if(isCursorVisible){
   makeCursorAndFrameSegments();
-  project(canvas, LEFT_CURSOR_LINE, leftEye, screenZ, rotation, cursorSegments);
-  project(canvas, RIGHT_CURSOR_LINE, rightEye, screenZ, rotation, cursorSegments);
-  project(canvas, LEFT_FRAME_LINE, leftEye, screenZ, rotation, frameSegments);
-  project(canvas, RIGHT_FRAME_LINE, rightEye, screenZ, rotation, frameSegments);
+  project(canvas, LEFT_CURSOR_LINE, eyes.leftEye, screenZ, rotation, cursorSegments);
+  project(canvas, RIGHT_CURSOR_LINE, eyes.rightEye, screenZ, rotation, cursorSegments);
+  project(canvas, LEFT_FRAME_LINE, eyes.leftEye, screenZ, rotation, frameSegments);
+  project(canvas, RIGHT_FRAME_LINE, eyes.rightEye, screenZ, rotation, frameSegments);
   if(linkMarker!=null) {
-     project(canvas, LEFT_MARKER_LINE, leftEye, screenZ, rotation, linkMarkerSegments);
-     project(canvas, RIGHT_MARKER_LINE, rightEye, screenZ, rotation, linkMarkerSegments);     
+     project(canvas, LEFT_MARKER_LINE, eyes.leftEye, screenZ, rotation, linkMarkerSegments);
+     project(canvas, RIGHT_MARKER_LINE, eyes.rightEye, screenZ, rotation, linkMarkerSegments);     
      }
   }
 }
@@ -238,6 +192,7 @@ canvas.stroke();
 function getData()
 {
 if(DATA.segments) segments=DATA.segments;
+if(DATA.eyes) eyes=DATA.eyes;
 // ...
 }
 
@@ -247,6 +202,8 @@ var x;
 x=document.getElementById("DataId");
 var data={};
 data.segments=segments;
+data.eyes=eyes;
+
 x.innerHTML="DATA = "+JSON.stringify(data, null, " ");
 var serializer= new XMLSerializer();
 var string=serializer.serializeToString(document);
@@ -290,8 +247,6 @@ redraw();
 
 function onMouseMove(evt){
 if(mouseAction!=null){
-  // x=invCTM.a*evt.clientX+invCTM.e;
-  // y=invCTM.d*evt.clientY+invCTM.f;
   x=canvas.xr(evt.clientX);
   y=canvas.yr(evt.clientY);
 
@@ -305,9 +260,6 @@ document.onmousemove=onMouseMove;
 wasFirstClick=false;
 
 function onMouseDown(evt){
-  // invCTM=scr.getCTM().inverse();
-  // x=invCTM.a*evt.clientX+invCTM.e;
-  // y=invCTM.d*evt.clientY+invCTM.f;
   x=canvas.xr(evt.clientX);
   y=canvas.yr(evt.clientY);
 
@@ -347,9 +299,9 @@ redraw();
 
 function moveToMouseByVector(vDelta)
 {
-var v1= zPerspective(MONO_EYE, screenZ, mvMul(rotation,cursorPosition));
+var v1= zPerspective(eyes.MONO_EYE, screenZ, mvMul(rotation,cursorPosition));
 var next=vAdd(cursorPosition, vDelta);
-var v2= zPerspective(MONO_EYE, screenZ, mvMul(rotation,next));
+var v2= zPerspective(eyes.MONO_EYE, screenZ, mvMul(rotation,next));
 var dist1= sqLength2d(lastX-v1[0], lastY-v1[1]);
 var dist2= sqLength2d(lastX-v2[0], lastY-v2[1]);
 while(vLE([-frameSize,-frameSize,-frameSize],next) &&  vLE(next,[frameSize,frameSize,frameSize]) 
@@ -359,7 +311,7 @@ while(vLE([-frameSize,-frameSize,-frameSize],next) &&  vLE(next,[frameSize,frame
   v1=v2;
   dist1=dist2;
   next=vAdd(cursorPosition, vDelta);
-  v2= zPerspective(MONO_EYE, screenZ, mvMul(rotation,next));
+  v2= zPerspective(eyes.MONO_EYE, screenZ, mvMul(rotation,next));
   dist2= sqLength2d(lastX-v2[0], lastY-v2[1]);
   }
 }
@@ -371,8 +323,8 @@ redraw();
 }
 
 function toggleMonoStereo(){
-if(eyesMode=='mono') setEyesMode('stereo');
-else setEyesMode('mono');
+if(eyes.eyesMode=='mono') eyes.setMode('stereo');
+else eyes.setMode('mono');
 redraw();
 }
 
@@ -547,9 +499,6 @@ function right()
 }
 
 function onKeyDown(e){
-
-// isCursorMoving=true; // for tests
-
 code=e.keyCode? e.keyCode : e.charCode;
 switch(code)
 {
@@ -617,19 +566,8 @@ case 74: // J
 // editor.redraw();
 // alert(code); // for tests
 }
+
 document.onkeydown=onKeyDown;
-
-
-
-
-/*
-function onResize()
-{
-// invCTM=scr.getCTM().inverse();
-// alert('onResize  '+invCTM.toString()); //for tests
-}
-*/
-// window.onresize=onResize;
 
 
 // initializing actions
