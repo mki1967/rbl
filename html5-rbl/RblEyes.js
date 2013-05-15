@@ -20,4 +20,9 @@ else // stereo
   }
 }
 
-
+RblEyes.prototype.getData= function(eyesData)
+{
+for(field in eyesData) 
+  if (typeof(this[field]) != 'function')  this[field]=eyesData[field];
+  else alert(" "+field+" : "+eyesData[field]);
+}

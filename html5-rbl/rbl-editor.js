@@ -192,7 +192,8 @@ canvas.stroke();
 function getData()
 {
 if(DATA.segments) segments=DATA.segments;
-if(DATA.eyes) eyes=DATA.eyes;
+if(DATA.eyes) eyes.getData(DATA.eyes); 
+ 
 // ...
 }
 
